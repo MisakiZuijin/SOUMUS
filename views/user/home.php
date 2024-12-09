@@ -60,7 +60,6 @@ $username = $_SESSION['username'];
                     FROM music m 
                     JOIN users u ON m.id_user = u.id_user 
                     ORDER BY m.upload_date DESC 
-                    LIMIT 10
                 ");
 
                 if ($stmt->rowCount() > 0) {

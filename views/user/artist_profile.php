@@ -71,5 +71,7 @@ if (isset($_GET['id'])) {
             </ul>
         <?php endif; ?>
     </main>
+
+    <?php include '../../music-navbar.php'; ?>
 </body>
 </html>

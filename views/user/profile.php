@@ -14,6 +14,10 @@ $stmt = $pdo->prepare("SELECT username, email, date_of_birth, photo, artist_name
 $stmt->execute([$user_id]);
 $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
+$stmt = $pdo->prepare("SELECT id_music, title, image FROM music WHERE id_user = ?");
+$stmt->execute([$user_id]);
+$music_list = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
 // Proses pembaruan profil
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = $_POST['email'];
@@ -105,6 +109,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <button type="submit">Perbarui Profil</button>
         </form>
     </main>
+
+    <h2>Musik yang Diunggah</h2>
+    <?php if (empty($music_list)): ?>
+        <p>Anda belum mengunggah musik.</p>
+    <?php else: ?>
+        <ul>
+            <?php foreach ($music_list as $music): ?>
+                <li>
+                    <?php if (!empty($music['image'])): ?>
+                        <img src="../../public/uploads/images/<?= htmlspecialchars($music['image']) ?>" 
+                             alt="Cover <?= htmlspecialchars($music['title']) ?>" 
+                             style="width:100px;height:auto;">
+                    <?php endif; ?>
+                    <?= htmlspecialchars($music['title']) ?> 
+                    <a href="edit_music.php?id=<?= $music['id_music'] ?>" style="color: blue; text-decoration: underline;">Edit</a>
+                </li>
+            <?php endforeach; ?>
+        </ul>
+    <?php endif; ?>
     <?php include '../../music-navbar.php'; ?>
 </body>
 </html>
