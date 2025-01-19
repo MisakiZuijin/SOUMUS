@@ -84,13 +84,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['playlist_id'])) {
     <h2>Daftar Playlist</h2>
     <ul>
         <?php foreach ($playlists as $playlist): ?>
+            <?php error_log("Generated Playlist Link: detail_playlist.php?playlist_id=" . $playlist['id_playlist']); ?>
             <li>
-                <a href="playlist_detail.php?playlist_id=<?= htmlspecialchars($playlist['id']) ?>">
+                <a href="detail_playlist.php?id_playlist=<?= htmlspecialchars($playlist['id_playlist']) ?>">
                     <?= htmlspecialchars($playlist['name']) ?>
                 </a>
                 <form method="POST" action="playlist.php" style="display:inline;">
                     <input type="hidden" name="action" value="delete">
-                    <input type="hidden" name="playlist_id" value="<?= htmlspecialchars($playlist['id']) ?>">
+                    <input type="hidden" name="playlist_id" value="<?= htmlspecialchars($playlist['id_playlist']) ?>">
                     <button type="submit" onclick="return confirm('Hapus playlist ini?')">Hapus</button>
                 </form>
             </li>
@@ -114,7 +115,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['playlist_id'])) {
         const createModal = document.getElementById('createPlaylistModal');
         const overlay = document.getElementById('overlay');
 
-        document.getElementById('createPlaylistButton').addEventListener('click', () => {
+        document.getElementById('createPlaylistModal').addEventListener('click', () => {
             createModal.classList.add('active');
             overlay.classList.add('active');
         });

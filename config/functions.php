@@ -37,14 +37,17 @@ function get_playlists($pdo, $user_id) {
 function get_playlist_details($pdo, $playlist_id) {
     try {
         $stmt = $pdo->prepare("
-            SELECT dp.id, m.title, m.artist, m.upload_date
-            FROM detail_playlist dp
-            JOIN music m ON dp.music_id = m.id_music
-            WHERE dp.playlist_id = ?
+            SELECT dp.id_playlist, m.title, m.artist_name, m.upload_date
+            FROM playlist_details AS dp
+            JOIN music AS m ON dp.id_music = m.id_music
+            WHERE dp.id_playlist = ?
         ");
         $stmt->execute([$playlist_id]);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $details = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        error_log("Playlist Details: " . json_encode($details)); // Log hasil query
+        return $details;
     } catch (PDOException $e) {
+        error_log("Error fetching playlist details: " . $e->getMessage());
         return false;
     }
 }
@@ -61,7 +64,7 @@ function add_song_to_playlist($pdo, $playlist_id, $music_id) {
 
 function delete_playlist($pdo, $playlist_id, $user_id) {
     try {
-        $stmt = $pdo->prepare("DELETE FROM playlists WHERE id = ? AND id_user = ?");
+        $stmt = $pdo->prepare("DELETE FROM playlists WHERE id_playlist = ? AND id_user = ?");
         $stmt->execute([$playlist_id, $user_id]); // Gunakan $user_id untuk mencocokkan dengan id_user
         return true;
     } catch (PDOException $e) {
