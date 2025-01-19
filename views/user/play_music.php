@@ -8,7 +8,9 @@ if (!is_logged_in()) {
 }
 
 if (isset($_GET['id'])) {
-    $id_music = $_GET['id'];
+    $id_music = intval($_GET['id']); // Pastikan ID selalu berupa integer
+    error_log("ID Musik yang diterima: " . $id_music); // Debugging
+
     $stmt = $pdo->prepare("SELECT * FROM music WHERE id_music = ?");
     $stmt->execute([$id_music]);
     $music = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -42,7 +44,10 @@ if (isset($_GET['id'])) {
     <main>
         <h2>Memutar: <?= htmlspecialchars($music['title']) ?></h2>
         <p>Artis: <?= htmlspecialchars($music['artist']) ?></p>
-        <button onclick="playMusic('<?= htmlspecialchars($music['title']) ?>', '../../public/uploads/music/<?= htmlspecialchars($music['file_name']) ?>')">
+        <button onclick="playMusic(
+            '<?= addslashes($music['title']) ?>',
+            '../../public/uploads/music/<?= addslashes($music['file_name']) ?>',
+            <?= intval($music['id_music']) ?>)">
             Putar Musik
         </button>
     </main>

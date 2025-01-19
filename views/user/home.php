@@ -86,6 +86,7 @@ $username = $_SESSION['username'];
         </ul>
     </main>
 
+    <script src="../../public/js/like.js"></script>
     <?php include '../../music-navbar.php'; ?>
 </body>
 </html>

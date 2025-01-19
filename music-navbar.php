@@ -9,6 +9,9 @@
                 Browser Anda tidak mendukung pemutar audio.
             </audio>
         </div>
+        <button onclick="likeMusic()" id="like-button" style="background: #00f; color: #fff; border: none; padding: 5px 10px; margin-right: 10px; cursor: pointer;">
+            Like ❤️
+        </button>
         <button onclick="stopMusic()" style="background: #f00; color: #fff; border: none; padding: 5px 10px; margin-right: 20px;  cursor: pointer;">
             Stop
         </button>
@@ -20,11 +23,38 @@
     const musicTitleElement = document.getElementById('music-title');
     const musicSourceElement = document.getElementById('music-source');
 
-    function playMusic(title, file) {
-        localStorage.setItem('musicTitle', title);
-        localStorage.setItem('musicFile', file);
-        localStorage.setItem('musicTime', 0); // Mulai dari awal
-        loadMusic();
+    musicPlayer.addEventListener('volumechange', () => {
+        const currentVolume = musicPlayer.volume;
+        localStorage.setItem('musicVolume', currentVolume);
+        console.log("Volume disimpan:", currentVolume);
+    });
+
+    musicPlayer.addEventListener('play', () => {
+        localStorage.setItem('musicPaused', false); // Lagu sedang dimainkan
+        console.log("Status pemutar: Playing");
+    });
+
+    musicPlayer.addEventListener('pause', () => {
+        localStorage.setItem('musicPaused', true); // Lagu sedang dijeda
+        console.log("Status pemutar: Paused");
+    });
+
+    function playMusic(title, file, id) {
+    console.log("Memutar musik dengan ID:", id); // Debugging
+
+    if (!id || isNaN(id)) {
+        console.error("ID Musik tidak valid:", id); // Log jika ID tidak valid
+        return;
+    }
+
+    // Simpan detail musik ke localStorage
+    localStorage.setItem('musicTitle', title);
+    localStorage.setItem('musicFile', file);
+    localStorage.setItem('musicId', id); // Simpan ID musik
+    localStorage.setItem('musicTime', 0);
+
+    // Perbarui tampilan dan audio
+    loadMusic();
     }
 
     function stopMusic() {
@@ -35,11 +65,13 @@
         loadMusic();
     }
 
+    
     function loadMusic() {
         const title = localStorage.getItem('musicTitle');
         const file = localStorage.getItem('musicFile');
         const savedTime = parseFloat(localStorage.getItem('musicTime')) || 0;
-        const savedVolume = parseFloat(localStorage.getItem('musicVolume')) || 1; // Default volume 100%
+        const savedVolume = parseFloat(localStorage.getItem('musicVolume'));
+        const isPaused = localStorage.getItem('musicPaused') === 'true'; // Ambil status paused
 
         if (title && file) {
             musicTitleElement.textContent = title;
@@ -47,21 +79,23 @@
 
             musicPlayer.load();
 
-            // Tunggu hingga file siap untuk dimainkan
             musicPlayer.addEventListener('loadedmetadata', () => {
-                musicPlayer.currentTime = savedTime; // Lanjutkan dari waktu terakhir
-                musicPlayer.volume = savedVolume; // Setel volume terakhir
-                musicPlayer.play();
+                musicPlayer.currentTime = savedTime;
+
+                if (!isNaN(savedVolume)) {
+                    musicPlayer.volume = savedVolume; // Setel volume yang disimpan
+                }
+
+                if (!isPaused) {
+                    musicPlayer.play(); // Mainkan jika statusnya "Playing"
+                    console.log("Status pemutar: Playing");
+                } else {
+                    console.log("Status pemutar: Paused");
+                }
             });
 
-            // Simpan waktu pemutaran terakhir setiap detik
             musicPlayer.addEventListener('timeupdate', () => {
                 localStorage.setItem('musicTime', musicPlayer.currentTime);
-            });
-
-            // Simpan pengaturan volume setiap kali berubah
-            musicPlayer.addEventListener('volumechange', () => {
-                localStorage.setItem('musicVolume', musicPlayer.volume);
             });
         } else {
             musicTitleElement.textContent = 'Tidak ada musik yang diputar';
